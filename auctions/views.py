@@ -6,8 +6,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
 
-from .models import User, AuctionList, UserList, WatchList, Bid
-from .forms import NewAuction, BidForm
+from .models import User, AuctionList, UserList, WatchList, Bid, Comments
+from .forms import NewAuction, BidForm, CommentForm
 
 
 def index(request):
@@ -102,7 +102,9 @@ def listingpage(request, listing_id):
             "form": BidForm(),
             "close": currentuser,
             "auction": auction,
-            "winner": winner
+            "winner": winner,
+            "commentform": CommentForm(),
+            "comments": Comments.objects.filter(auctionlist_id=auction)
         })
     else:
         auction = AuctionList.objects.get(pk=listing_id)
@@ -111,12 +113,14 @@ def listingpage(request, listing_id):
             bid = currentbid.aggregate(Max('bid'))
             return render(request, "auctions/listingpage.html", {
                 "listing": AuctionList.objects.get(pk=listing_id),
-                "currentbid": bid
+                "currentbid": bid,
+                "comments": Comments.objects.filter(auctionlist_id=auction)
             })
         else:
             return render(request, "auctions/listingpage.html", {
                 "listing": AuctionList.objects.get(pk=listing_id),
                 "currentbid": None,
+                "comments": Comments.objects.filter(auctionlist_id=auction)
             })
 
 @login_required
@@ -207,3 +211,13 @@ def close(request, listing_id):
             auct.closed = True
             auct.save()
             return HttpResponseRedirect(reverse("index"))
+
+@login_required
+def addcomment(request, listing_id):
+    if request.method == "POST":
+        user = request.user
+        comment = request.POST["comment"]
+        auct = AuctionList.objects.get(pk=listing_id)
+        com = Comments(user_id=user, auctionlist_id=auct, comment=comment)
+        com.save()
+        return HttpResponseRedirect(reverse("listingpage", args=[listing_id]))

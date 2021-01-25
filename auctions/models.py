@@ -12,6 +12,7 @@ class AuctionList(models.Model):
     categories = models.CharField(max_length=64, blank=True)
     closed = models.BooleanField(default=False)
     winner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.title} | Category : {self.categories} | Bid : {self.startingbid}"
@@ -20,6 +21,7 @@ class Bid(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     auctionlist_id = models.ForeignKey(AuctionList, on_delete=models.CASCADE)
     bid = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"({self.user_id}) bid ({self.auctionlist_id}) for ({self.bid})"
@@ -29,6 +31,7 @@ class Comments(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     auctionlist_id = models.ForeignKey(AuctionList, on_delete=models.CASCADE)
     comment = models.TextField(max_length=1000)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class UserList(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -8,3 +8,6 @@ class NewAuction(forms.ModelForm):
 
 class BidForm(forms.Form):
     place_bid = forms.IntegerField()
+
+class CommentForm(forms.Form):
+    comment = forms.CharField()

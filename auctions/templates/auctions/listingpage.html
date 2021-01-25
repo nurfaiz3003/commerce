@@ -3,6 +3,7 @@
 {% block body %}
 
     <h2>{{ listing.title }}</h2>
+    <p>Created at : {{ listing.created_at }}</p>
 
     {% if winner %}
         <div>You Won!</div>
@@ -66,6 +67,33 @@
                     </form>
             {% endif %}
         {% endif %}
+    {% endif %}
+
+    <h4>Comments</h4>
+    {% if comments %}
+        {% for comment in comments %}
+            <div>
+                <h5>{{ comment.user_id }}</h5>
+                <p>Commented at : {{ comment.created_at }}</p>
+                <p>{{ comment.comment }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Be the first to comment!</p>
+    {% endif %}
+
+
+    {% if user.is_authenticated %}
+            {% if auction.closed %}
+                {% else %}
+                    <form action="{% url 'addcomment' listing.pk %}" method="post">
+                        {% csrf_token %}
+                        {{ commentform }}
+                        <input class="btn btn-primary" type="submit" value="Add Comment">
+                    </form>
+            {% endif %}
+        {% else %}
+            <p>Log In to Add Comment.</p>
     {% endif %}
 
 
