@@ -10,7 +10,12 @@
 
     <img src="{{ listing.image }}" alt="image">
     <p>{{ listing.desc }}</p>
-    <h3>{{ listing.startingbid }}</h3>
+    <h3>Starting Bid : {{ listing.startingbid }}</h3>
+    {% if currentbid.bid__max %} 
+        <h3>Current Highest Bid : {{ currentbid.bid__max }}</h3>
+    {% else %}
+        <h3>No bid.</h3>
+    {% endif %}
     <p>{{ listing.categories }}</p>
     
     {% if user.is_authenticated %}
@@ -28,5 +33,25 @@
     {% else %}
         Log in to add to watchlist.
     {% endif %}
+
+    {% if user.is_authenticated %}
+        <form action="{% url 'placebid' listing.pk %}" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input class="btn btn-primary" type="submit" value="Place Bid">
+        </form>
+    {% else %}
+        Log in to add to placebid.
+    {% endif %}
+    
+    {% if user.is_authenticated %}
+        {% if close %}
+            <form action="{% url 'close' listing.pk %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-primary" type="submit" value="close">
+            </form>
+        {% endif %}
+    {% endif %}
+
 
 {% endblock %}

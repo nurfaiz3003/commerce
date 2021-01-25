@@ -4,9 +4,10 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.db.models import Max
 
-from .models import User, AuctionList, UserList, WatchList
-from .forms import NewAuction
+from .models import User, AuctionList, UserList, WatchList, Bid
+from .forms import NewAuction, BidForm
 
 
 def index(request):
@@ -88,15 +89,29 @@ def add(request):
 def listingpage(request, listing_id):
     if request.user.is_authenticated:
         auction = AuctionList.objects.get(pk=listing_id)
+        currentuser= UserList.objects.filter(auctionlist_id = auction, user_id = request.user)
         check = WatchList.objects.filter(auctionlist_id = auction, user_id = request.user)
         return render(request, "auctions/listingpage.html", {
             "listing": AuctionList.objects.get(pk=listing_id),
-            "check": check
+            "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
+            "check": check,
+            "form": BidForm(),
+            "close": currentuser
         })
     else:
-        return render(request, "auctions/listingpage.html", {
-            "listing": AuctionList.objects.get(pk=listing_id)
-        })
+        auction = AuctionList.objects.get(pk=listing_id)
+        currentbid = Bid.objects.filter(auctionlist_id = auction)
+        if currentbid:
+            bid = currentbid.aggregate(Max('bid'))
+            return render(request, "auctions/listingpage.html", {
+                "listing": AuctionList.objects.get(pk=listing_id),
+                "currentbid": bid
+            })
+        else:
+            return render(request, "auctions/listingpage.html", {
+                "listing": AuctionList.objects.get(pk=listing_id),
+                "currentbid": None,
+            })
 
 @login_required
 def addwatchlist(request, listing_id):
@@ -112,3 +127,64 @@ def removewatchlist(request, listing_id):
         auction = AuctionList.objects.get(pk=listing_id)
         WatchList.objects.filter(user_id = request.user, auctionlist_id = auction).delete()
         return HttpResponseRedirect(reverse("listingpage", args=[listing_id]))
+    
+@login_required
+def placebid(request, listing_id):
+    if request.method == "POST":
+        bid_form = BidForm(request.POST)
+        if bid_form.is_valid():
+            bid = bid_form.cleaned_data['place_bid']
+            auction = AuctionList.objects.get(pk=listing_id)
+            lbid = Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid'))
+            latestbid = lbid['bid__max']
+            startingbid = AuctionList.objects.get(pk=listing_id).startingbid
+            check = WatchList.objects.filter(auctionlist_id = auction, user_id = request.user)
+            if latestbid:
+                if bid > latestbid:
+                    placebid = Bid(user_id = request.user, auctionlist_id = auction, bid = int(bid))
+                    placebid.save()
+                    return render(request, "auctions/listingpage.html", {
+                            "listing": AuctionList.objects.get(pk=listing_id),
+                            "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
+                            "check": check,
+                            "form": BidForm(),
+                            "message": "Place Bid Succesful"
+                        })
+                else:
+                    return render(request, "auctions/listingpage.html", {
+                            "listing": AuctionList.objects.get(pk=listing_id),
+                            "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
+                            "check": check,
+                            "form": BidForm(),
+                            "message": "Bid must be larger than Current or Starting Bid"
+                        })
+            else:
+                if bid > startingbid:
+                    placebid = Bid(user_id = request.user, auctionlist_id = auction, bid = int(bid))
+                    placebid.save()
+                    return render(request, "auctions/listingpage.html", {
+                            "listing": AuctionList.objects.get(pk=listing_id),
+                            "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
+                            "check": check,
+                            "form": BidForm(),
+                            "message": "Place Bid Succesful"
+                        })
+                else:
+                    return render(request, "auctions/listingpage.html", {
+                            "listing": AuctionList.objects.get(pk=listing_id),
+                            "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
+                            "check": check,
+                            "form": BidForm(),
+                            "message": "Bid must be larger than Current or Starting Bid"
+                        })
+        else:
+            return render(request, "auctions/listingpage.html", {
+                "listing": AuctionList.objects.get(pk=listing_id),
+                "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
+                "form": BidForm(),
+                "message": "Form is Not Valid"
+            })
+
+@login_required
+def close(request, listing_id):
+    pass

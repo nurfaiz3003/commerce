@@ -10,6 +10,8 @@ class AuctionList(models.Model):
     startingbid = models.IntegerField()
     image = models.URLField(blank=True)
     categories = models.CharField(max_length=64, blank=True)
+    closed = models.BooleanField(default=False)
+    winner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f"{self.title} | Category : {self.categories} | Bid : {self.startingbid}"
