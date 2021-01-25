@@ -12,7 +12,8 @@ from .forms import NewAuction, BidForm
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": AuctionList.objects.all()
+        "activelistings": AuctionList.objects.exclude(closed=True),
+        "closedlistings": AuctionList.objects.filter(closed=True)
     })
 
 
@@ -91,12 +92,17 @@ def listingpage(request, listing_id):
         auction = AuctionList.objects.get(pk=listing_id)
         currentuser= UserList.objects.filter(auctionlist_id = auction, user_id = request.user)
         check = WatchList.objects.filter(auctionlist_id = auction, user_id = request.user)
+        winner = False
+        if request.user == auction.winner:
+            winner = True
         return render(request, "auctions/listingpage.html", {
             "listing": AuctionList.objects.get(pk=listing_id),
             "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
             "check": check,
             "form": BidForm(),
-            "close": currentuser
+            "close": currentuser,
+            "auction": auction,
+            "winner": winner
         })
     else:
         auction = AuctionList.objects.get(pk=listing_id)
@@ -187,4 +193,17 @@ def placebid(request, listing_id):
 
 @login_required
 def close(request, listing_id):
-    pass
+    if request.method == "POST":
+        auct = AuctionList.objects.get(pk=listing_id)
+        highest = Bid.objects.filter(auctionlist_id = auct).aggregate(Max('bid'))
+        bidlist = Bid.objects.get(bid=highest["bid__max"])
+        if highest:
+            user = bidlist.user_id
+            auct.closed = True
+            auct.winner = user
+            auct.save()
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            auct.closed = True
+            auct.save()
+            return HttpResponseRedirect(reverse("index"))

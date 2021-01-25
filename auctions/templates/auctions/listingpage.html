@@ -4,6 +4,10 @@
 
     <h2>{{ listing.title }}</h2>
 
+    {% if winner %}
+        <div>You Won!</div>
+    {% endif %}
+
     {% if message %}
         <div>{{ message }}</div>
     {% endif %}
@@ -19,39 +23,54 @@
     <p>{{ listing.categories }}</p>
     
     {% if user.is_authenticated %}
-        {% if not check %}
-            <form action="{% url 'addwatchlist' listing.pk %}" method="post">
-                {% csrf_token %}
-                <input class="btn btn-primary" type="submit" value="Add to Watchlist">
-            </form>
+        {% if auction.closed %}
+            Auction Closed!
         {% else %}
-        <form action="{% url 'removewatchlist' listing.pk %}" method="post">
-            {% csrf_token %}
-            <input class="btn btn-primary" type="submit" value="Remove from Watchlist">
-        </form>
+            {% if not check %}
+                <form action="{% url 'addwatchlist' listing.pk %}" method="post">
+                    {% csrf_token %}
+                    <input class="btn btn-primary" type="submit" value="Add to Watchlist">
+                </form>
+            {% else %}
+            <form action="{% url 'removewatchlist' listing.pk %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-primary" type="submit" value="Remove from Watchlist">
+            </form>
+            {% endif %}
         {% endif %}
     {% else %}
         Log in to add to watchlist.
     {% endif %}
 
     {% if user.is_authenticated %}
-        <form action="{% url 'placebid' listing.pk %}" method="post">
-            {% csrf_token %}
-            {{ form }}
-            <input class="btn btn-primary" type="submit" value="Place Bid">
-        </form>
+        {% if auction.closed %}
+            Auction Closed!
+        {% else %}
+            <form action="{% url 'placebid' listing.pk %}" method="post">
+                {% csrf_token %}
+                {{ form }}
+                <input class="btn btn-primary" type="submit" value="Place Bid">
+            </form>
+        {% endif %}
     {% else %}
         Log in to add to placebid.
     {% endif %}
     
     {% if user.is_authenticated %}
         {% if close %}
-            <form action="{% url 'close' listing.pk %}" method="post">
-                {% csrf_token %}
-                <input class="btn btn-primary" type="submit" value="close">
-            </form>
+            {% if auction.closed %}
+                {% else %}
+                    <form action="{% url 'close' listing.pk %}" method="post">
+                        {% csrf_token %}
+                        <input class="btn btn-primary" type="submit" value="close">
+                    </form>
+            {% endif %}
         {% endif %}
     {% endif %}
 
 
 {% endblock %}
+
+{% if auction.closed %}
+{% else %}
+{% endif %}
