@@ -6,8 +6,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
 
-from .models import User, AuctionList, UserList, WatchList, Bid, Comments
-from .forms import NewAuction, BidForm, CommentForm
+from .models import User, AuctionList, UserList, WatchList, Bid, Comments, Categories
+from .forms import NewAuction, BidForm, CommentForm, AddCategory
 
 
 def index(request):
@@ -80,11 +80,13 @@ def add(request):
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "auctions/add.html", {
-                "form": form
+                "form": form,
+                "addcategory" : AddCategory() 
             }) 
 
     return render(request, "auctions/add.html", {
-        "form": NewAuction() 
+        "form": NewAuction(),
+        "addcategory" : AddCategory() 
     })
 
 def listingpage(request, listing_id):
@@ -226,4 +228,35 @@ def addcomment(request, listing_id):
 def mylists(request):
     return render (request, "auctions/watchlist.html", {
         "mylisting": WatchList.objects.filter(user_id = request.user)
+    })
+
+@login_required
+def addcategories(request):
+    if request.method == "POST":
+        addcategory = AddCategory(request.POST)
+        if addcategory.is_valid():
+            addcategory.save()
+            return render(request, "auctions/add.html", {
+                "form": NewAuction(),
+                "addcategory" : AddCategory(),
+                "message" : "Add Category Succesful."
+            }) 
+        else:
+            return render(request, "auctions/add.html", {
+                "form": NewAuction(),
+                "addcategory" : AddCategory(),
+                "message" : "Category Already Exists."
+            }) 
+
+def categories(request):
+    categorylist = Categories.objects.all()
+    return render(request, "auctions/categories.html", {
+        "categorylist": categorylist
+    })
+
+def linkcat(request, cat_id):
+    category = Categories.objects.get(pk=cat_id)
+    categorylist = category.listing.all()
+    return render(request, "auctions/categorylist.html", {
+        "categorylist": categorylist
     })

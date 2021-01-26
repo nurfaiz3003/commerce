@@ -14,6 +14,12 @@
         <input class="btn btn-primary" type="submit" value="Create">
     </form>
 
+    <form action="{% url 'addcategory' %}" method="post">
+        {% csrf_token %}
+        {{ addcategory }}
+        <input class="btn btn-primary" type="submit" value="Add Category">
+    </form>
+
     Don't have an account? <a href="{% url 'register' %}">Register here.</a>
 
 {% endblock %}

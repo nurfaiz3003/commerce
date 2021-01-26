@@ -42,20 +42,6 @@
     {% else %}
         Log in to add to watchlist.
     {% endif %}
-
-    {% if user.is_authenticated %}
-        {% if auction.closed %}
-            Auction Closed!
-        {% else %}
-            <form action="{% url 'placebid' listing.pk %}" method="post">
-                {% csrf_token %}
-                {{ form }}
-                <input class="btn btn-primary" type="submit" value="Place Bid">
-            </form>
-        {% endif %}
-    {% else %}
-        Log in to add to placebid.
-    {% endif %}
     
     {% if user.is_authenticated %}
         {% if close %}
@@ -66,6 +52,12 @@
                         <input class="btn btn-primary" type="submit" value="close">
                     </form>
             {% endif %}
+        {% else %}
+            <form action="{% url 'placebid' listing.pk %}" method="post">
+                {% csrf_token %}
+                {{ form }}
+                <input class="btn btn-primary" type="submit" value="Place Bid">
+            </form>
         {% endif %}
     {% endif %}
 

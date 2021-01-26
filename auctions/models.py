@@ -4,14 +4,20 @@ from django.db import models
 class User(AbstractUser):
     pass
 
+class Categories(models.Model):
+    name = models.CharField(max_length=64, unique=True)
+
+    def __str__(self):
+        return f"{self.name}"
+
 class AuctionList(models.Model):
     title = models.CharField(max_length=64)
     desc = models.TextField(max_length=1000)
     startingbid = models.IntegerField()
     image = models.URLField(blank=True)
-    categories = models.CharField(max_length=64, blank=True)
+    categories = models.ForeignKey(Categories, blank=True, null=True, on_delete=models.SET_NULL, related_name="listing")
     closed = models.BooleanField(default=False)
-    winner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    winner = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

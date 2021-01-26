@@ -1,0 +1,14 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Category Listing</h2>
+    {% for listing in categorylist %}
+    <div>
+        <h2><a href="{% url 'listingpage' listing.pk %}">{{ listing.title }}</a></h2>
+        <img src="{{ listing.image }}" alt="Italian Trulli">>
+        <p>{{ listing.desc }}</p>
+        <p>Category : {{ listing.categories }}</p>
+        <h3>Starting Bid : {{ listing.startingbid }}</h3>
+    </div>
+    {% endfor %}
+{% endblock %}
