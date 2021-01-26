@@ -221,3 +221,9 @@ def addcomment(request, listing_id):
         com = Comments(user_id=user, auctionlist_id=auct, comment=comment)
         com.save()
         return HttpResponseRedirect(reverse("listingpage", args=[listing_id]))
+
+@login_required
+def mylists(request):
+    return render (request, "auctions/watchlist.html", {
+        "mylisting": WatchList.objects.filter(user_id = request.user)
+    })
