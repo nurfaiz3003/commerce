@@ -68,6 +68,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+# View for Adding New Auction to Model DB and to UserList
 @login_required
 def add(request):
     if request.method == "POST":
@@ -89,6 +90,7 @@ def add(request):
         "addcategory" : AddCategory() 
     })
 
+# View for Rendering Listing Item Page
 def listingpage(request, listing_id):
     if request.user.is_authenticated:
         auction = AuctionList.objects.get(pk=listing_id)
@@ -127,6 +129,7 @@ def listingpage(request, listing_id):
                 "comments": Comments.objects.filter(auctionlist_id=auction)
             })
 
+# View for Add Item to WatchList
 @login_required
 def addwatchlist(request, listing_id):
     if request.method == "POST":
@@ -135,13 +138,15 @@ def addwatchlist(request, listing_id):
         watch.save()
         return HttpResponseRedirect(reverse("listingpage", args=[listing_id]))
 
+# View for Remove Item from Watchlist
 @login_required
 def removewatchlist(request, listing_id):
     if request.method == "POST":
         auction = AuctionList.objects.get(pk=listing_id)
         WatchList.objects.filter(user_id = request.user, auctionlist_id = auction).delete()
         return HttpResponseRedirect(reverse("listingpage", args=[listing_id]))
-    
+
+# View for Place Bid and Add Data to Bid DB
 @login_required
 def placebid(request, listing_id):
     if request.method == "POST":
@@ -209,6 +214,7 @@ def placebid(request, listing_id):
                 "message": "Form is Not Valid"
             })
 
+# View for Close the Bid on the Item the User Has
 @login_required
 def close(request, listing_id):
     if request.method == "POST":
@@ -226,6 +232,7 @@ def close(request, listing_id):
             auct.save()
             return HttpResponseRedirect(reverse("index"))
 
+# View for adding comments
 @login_required
 def addcomment(request, listing_id):
     if request.method == "POST":
@@ -236,12 +243,14 @@ def addcomment(request, listing_id):
         com.save()
         return HttpResponseRedirect(reverse("listingpage", args=[listing_id]))
 
+# View for Rendering Watch List Page
 @login_required
 def mylists(request):
     return render (request, "auctions/watchlist.html", {
         "mylisting": WatchList.objects.filter(user_id = request.user)
     })
 
+# View for Adding Categories
 @login_required
 def addcategories(request):
     if request.method == "POST":
@@ -260,12 +269,14 @@ def addcategories(request):
                 "message" : "Category Already Exists."
             }) 
 
+# View for Render Categories Page
 def categories(request):
     categorylist = Categories.objects.all()
     return render(request, "auctions/categories.html", {
         "categorylist": categorylist
     })
 
+# View for Rendering Available Items on The Categories
 def linkcat(request, cat_id):
     category = Categories.objects.get(pk=cat_id)
     categorylist = category.listing.all()

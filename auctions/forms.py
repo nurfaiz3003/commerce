@@ -2,6 +2,7 @@ from django import forms
 from .models import AuctionList, Categories
 from django.utils.translation import gettext_lazy as _
 
+#Forms for Create Auctions Page
 class NewAuction(forms.ModelForm):
     class Meta:
         model = AuctionList
@@ -23,6 +24,7 @@ class NewAuction(forms.ModelForm):
             'categories': _('Select Category'),
         }
 
+#Forms for Bidding in Listing Item Page
 class BidForm(forms.Form):
     place_bid = forms.IntegerField(widget = forms.TextInput(
         attrs={
@@ -32,6 +34,7 @@ class BidForm(forms.Form):
         }
     ))
 
+#Forms for Adding Comments in Listing Page 
 class CommentForm(forms.Form):
     comment = forms.CharField(widget = forms.TextInput(
         attrs={
@@ -40,8 +43,7 @@ class CommentForm(forms.Form):
         }
     ))
 
-    
-
+#Forms for Adding New Category through Create Auction Page
 class AddCategory(forms.ModelForm):
     class Meta:
         model = Categories
