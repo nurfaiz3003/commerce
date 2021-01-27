@@ -1,96 +1,116 @@
 {% extends "auctions/layout.html" %}
 
-{% block body %}
-
-    <h2>{{ listing.title }}</h2>
-    <p>Created at : {{ listing.created_at }}</p>
-
-    {% if winner %}
-        <div>You Won!</div>
-    {% endif %}
-
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
-
-    <img src="{{ listing.image }}" alt="image">
-    <p>{{ listing.desc }}</p>
-    <h3>Starting Bid : {{ listing.startingbid }}</h3>
-    {% if currentbid.bid__max %} 
-        <h3>Current Highest Bid : {{ currentbid.bid__max }}</h3>
-    {% else %}
-        <h3>No bid.</h3>
-    {% endif %}
-    <p>{{ listing.categories }}</p>
-    
-    {% if user.is_authenticated %}
-        {% if auction.closed %}
-            Auction Closed!
-        {% else %}
-            {% if not check %}
-                <form action="{% url 'addwatchlist' listing.pk %}" method="post">
-                    {% csrf_token %}
-                    <input class="btn btn-primary" type="submit" value="Add to Watchlist">
-                </form>
-            {% else %}
-            <form action="{% url 'removewatchlist' listing.pk %}" method="post">
-                {% csrf_token %}
-                <input class="btn btn-primary" type="submit" value="Remove from Watchlist">
-            </form>
-            {% endif %}
-        {% endif %}
-    {% else %}
-        Log in to add to watchlist.
-    {% endif %}
-    
-    {% if user.is_authenticated %}
-        {% if close %}
-            {% if auction.closed %}
-                {% else %}
-                    <form action="{% url 'close' listing.pk %}" method="post">
-                        {% csrf_token %}
-                        <input class="btn btn-primary" type="submit" value="close">
-                    </form>
-            {% endif %}
-        {% else %}
-            <form action="{% url 'placebid' listing.pk %}" method="post">
-                {% csrf_token %}
-                {{ form }}
-                <input class="btn btn-primary" type="submit" value="Place Bid">
-            </form>
-        {% endif %}
-    {% endif %}
-
-    <h4>Comments</h4>
-    {% if comments %}
-        {% for comment in comments %}
-            <div>
-                <h5>{{ comment.user_id }}</h5>
-                <p>Commented at : {{ comment.created_at }}</p>
-                <p>{{ comment.comment }}</p>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>Be the first to comment!</p>
-    {% endif %}
-
-
-    {% if user.is_authenticated %}
-            {% if auction.closed %}
-                {% else %}
-                    <form action="{% url 'addcomment' listing.pk %}" method="post">
-                        {% csrf_token %}
-                        {{ commentform }}
-                        <input class="btn btn-primary" type="submit" value="Add Comment">
-                    </form>
-            {% endif %}
-        {% else %}
-            <p>Log In to Add Comment.</p>
-    {% endif %}
-
-
+{% block title %}
+Auctions | {{ listing.title }}
 {% endblock %}
 
-{% if auction.closed %}
-{% else %}
-{% endif %}
+{% block body %}
+    <div class="container">
+        <div class="row py-1">
+            <div class="col">
+                {% if winner %}
+                    <div class="alert alert-success" role="alert">
+                        You Won!
+                    </div>
+                {% endif %}
+        
+                {% if message %}
+                    <div class="alert alert-primary" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row py-1">
+            <div class="col">
+                <h2 class="text-center">{{ listing.title }}</h2>
+                <p class="text-center text-muted">Created at : {{ listing.created_at }}</p>
+            </div>
+        </div>
+        <div class="row py-4">
+            <div class="col-6 border rounded-left bg-light p-4">
+                <img src="{{ listing.image }}" class="img-fluid rounded" alt="image">
+            </div>
+            <div class="col-6 border rounded-right bg-light p-4">
+                <ul>
+                    <li class="lead">{{ listing.desc }}</li>
+                </ul>
+                <h6>Starting Bid : {{ listing.startingbid }}</h6>
+                {% if currentbid.bid__max %} 
+                    <h6><span class="badge badge-success">Current highest bid</span> : {{ currentbid.bid__max }}</h6>
+                {% else %}
+                    <span class="badge badge-danger">No available bid</span>
+                {% endif %}
+                <p class="lead">Category : {{ listing.categories }}</p>
+                
+                {% if user.is_authenticated %}
+                    {% if auction.closed %}
+                        Auction Closed!
+                    {% else %}
+                        {% if not check %}
+                            <form action="{% url 'addwatchlist' listing.pk %}" method="post">
+                                {% csrf_token %}
+                                <input class="btn btn-primary" type="submit" value="Add to Watchlist">
+                            </form>
+                        {% else %}
+                        <form action="{% url 'removewatchlist' listing.pk %}" method="post">
+                            {% csrf_token %}
+                            <input class="btn btn-primary" type="submit" value="Remove from Watchlist">
+                        </form>
+                        {% endif %}
+                    {% endif %}
+                {% else %}
+                    Log in to add to watchlist.
+                {% endif %}
+                
+                {% if user.is_authenticated %}
+                    {% if close %}
+                        {% if auction.closed %}
+                            {% else %}
+                                <form action="{% url 'close' listing.pk %}" class="py-2" method="post">
+                                    {% csrf_token %}
+                                    <input class="btn btn-danger" type="submit" value="Close Bid">
+                                </form>
+                        {% endif %}
+                    {% else %}
+                        <form action="{% url 'placebid' listing.pk %}" method="post">
+                            {% csrf_token %}
+                            {{ form }}
+                            <input class="btn btn-primary" type="submit" value="Place Bid">
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div class="row py-4">
+            <div class="col">
+                <h4>Comments</h4>
+                {% if comments %}
+                    {% for comment in comments %}
+                        <div>
+                            <h5>{{ comment.user_id }}</h5>
+                            <p>Commented at : {{ comment.created_at }}</p>
+                            <p>{{ comment.comment }}</p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Be the first to comment!</p>
+                {% endif %}
+            
+            
+                {% if user.is_authenticated %}
+                        {% if auction.closed %}
+                            {% else %}
+                                <form action="{% url 'addcomment' listing.pk %}" method="post">
+                                    {% csrf_token %}
+                                    {{ commentform }}
+                                    <input class="btn btn-primary" type="submit" value="Add Comment">
+                                </form>
+                        {% endif %}
+                    {% else %}
+                        <p>Log In to Add Comment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
