@@ -1,25 +1,40 @@
 {% extends "auctions/layout.html" %}
 
+{% block title %}
+    Create Listing
+{% endblock %}
+
 {% block body %}
-
-    <h2>Add</h2>
-
-    {% if message %}
-        <div>{{ message }}</div>
-    {% endif %}
-
-    <form action="{% url 'add' %}" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <input class="btn btn-primary" type="submit" value="Create">
-    </form>
-
-    <form action="{% url 'addcategory' %}" method="post">
-        {% csrf_token %}
-        {{ addcategory }}
-        <input class="btn btn-primary" type="submit" value="Add Category">
-    </form>
-
-    Don't have an account? <a href="{% url 'register' %}">Register here.</a>
-
+    <div class="container">
+        <h2 class="my-4">Create Listing</h2>
+        <div class="col">
+            {% if message %}
+                <div class="alert alert-primary" role="alert">
+                    {{ message }}
+                </div>
+            {% endif %}
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <form action="{% url 'add' %}" method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <input class="btn btn-primary" type="submit" value="Create">
+                </form>
+            </div>
+            <div class="form-group">
+                <form action="{% url 'addcategory' %}" method="post">
+                    {% csrf_token %}
+                    <p>Please add new category below if it's not available :</p>
+                    {{ addcategory.name.errors }}
+                    {{ addcategory.name }}
+                    <br>
+                    <input class="btn btn-primary" type="submit" value="Add Category">
+                </form>
+            </div>
+            <br>
+            <hr>
+            <br>
+        </div>
+    </div>
 {% endblock %}

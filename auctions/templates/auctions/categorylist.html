@@ -1,14 +1,30 @@
 {% extends "auctions/layout.html" %}
 
+{% block title %}
+    Category Listing Item
+{% endblock %}
+
 {% block body %}
-    <h2>Category Listing</h2>
-    {% for listing in categorylist %}
-    <div>
-        <h2><a href="{% url 'listingpage' listing.pk %}">{{ listing.title }}</a></h2>
-        <img src="{{ listing.image }}" alt="Italian Trulli">>
-        <p>{{ listing.desc }}</p>
-        <p>Category : {{ listing.categories }}</p>
-        <h3>Starting Bid : {{ listing.startingbid }}</h3>
+    <div class="container">
+        {% for listing in categorylist %}
+        <div class="row py-3">
+            <span class="badge badge-info">{{ listing.categories }} Item</span>
+        </div>
+        <div class="row">
+            <div class="col-sm-4 border rounded-left bg-light p-4">
+                <img src="{{ listing.image }}" class="img-thumbnail" alt="image">
+            </div>
+            <div class="col-sm-8 border rounded-right bg-light py-4 px-5">
+                <h2><a href="{% url 'listingpage' listing.pk %}">{{ listing.title }}</a></h2>
+                <p class="text-muted">Created at : {{ listing.created_at }}</p>
+                <ul>
+                    <li>{{ listing.desc }}</li>
+                </ul>
+                <p class="lead">Category : {{ listing.categories }}</p>
+                <h6>Starting Bid : ${{ listing.startingbid }}</h6>
+            </div>
+        </div>
+        <br>
+        {% endfor %}
     </div>
-    {% endfor %}
 {% endblock %}

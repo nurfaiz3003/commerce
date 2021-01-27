@@ -1,4 +1,7 @@
 {% extends "auctions/layout.html" %}
+{% block title %}
+    Auction
+{% endblock %}
 
 {% block body %}
     <div class="container">
@@ -17,8 +20,9 @@
                 <p class="lead">Category : {{ listing.categories }}</p>
                 <h6>Starting Bid : ${{ listing.startingbid }}</h6>
             </div>
-        {% endfor %}
         </div>
+        <br>
+        {% endfor %}
     </div>
     <hr class="mt-4">
     <div class="container">
@@ -38,6 +42,7 @@
                 <h6>Starting Bid : ${{ listing.startingbid }}</h6>
             </div>
         </div>
+        <br>
         {% endfor %}      
     </div>
 {% endblock %}

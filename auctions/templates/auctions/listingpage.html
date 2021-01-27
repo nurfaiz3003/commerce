@@ -45,22 +45,25 @@ Auctions | {{ listing.title }}
                 
                 {% if user.is_authenticated %}
                     {% if auction.closed %}
-                        Auction Closed!
+                        <span class="badge badge-danger">Auction Closed!</span>
                     {% else %}
                         {% if not check %}
                             <form action="{% url 'addwatchlist' listing.pk %}" method="post">
                                 {% csrf_token %}
                                 <input class="btn btn-primary" type="submit" value="Add to Watchlist">
                             </form>
+                            <br>
                         {% else %}
                         <form action="{% url 'removewatchlist' listing.pk %}" method="post">
                             {% csrf_token %}
                             <input class="btn btn-primary" type="submit" value="Remove from Watchlist">
                         </form>
+                        <br>
                         {% endif %}
                     {% endif %}
                 {% else %}
                     Log in to add to watchlist.
+                    <br>
                 {% endif %}
                 
                 {% if user.is_authenticated %}
@@ -73,11 +76,16 @@ Auctions | {{ listing.title }}
                                 </form>
                         {% endif %}
                     {% else %}
-                        <form action="{% url 'placebid' listing.pk %}" method="post">
-                            {% csrf_token %}
-                            {{ form }}
-                            <input class="btn btn-primary" type="submit" value="Place Bid">
-                        </form>
+                        {% if auction.closed %}
+                            {% else %}
+                            <form action="{% url 'placebid' listing.pk %}" method="post">
+                                {% csrf_token %}
+                                {{ form.place_bid.errors }}
+                                {{ form.place_bid }}
+                                <br>
+                                <input class="btn btn-primary" type="submit" value="Place Bid">
+                            </form>
+                        {% endif %}
                     {% endif %}
                 {% endif %}
             </div>
@@ -87,11 +95,15 @@ Auctions | {{ listing.title }}
                 <h4>Comments</h4>
                 {% if comments %}
                     {% for comment in comments %}
-                        <div>
-                            <h5>{{ comment.user_id }}</h5>
-                            <p>Commented at : {{ comment.created_at }}</p>
-                            <p>{{ comment.comment }}</p>
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="badge badge-dark">{{ comment.user_id }}</span> commented at {{ comment.created_at }}
+                            </div>
+                            <div class="card-body">
+                                <p>{{ comment.comment }}</p>
+                            </div>
                         </div>
+                        <br>
                     {% endfor %}
                 {% else %}
                     <p>Be the first to comment!</p>
@@ -101,11 +113,15 @@ Auctions | {{ listing.title }}
                 {% if user.is_authenticated %}
                         {% if auction.closed %}
                             {% else %}
-                                <form action="{% url 'addcomment' listing.pk %}" method="post">
-                                    {% csrf_token %}
-                                    {{ commentform }}
-                                    <input class="btn btn-primary" type="submit" value="Add Comment">
-                                </form>
+                                <div class="form-group">
+                                    <form action="{% url 'addcomment' listing.pk %}" method="post">
+                                        {% csrf_token %}
+                                        {{ commentform.comment.errors }}
+                                        {{ commentform.comment }}
+                                        <br>
+                                        <input class="btn btn-primary" type="submit" value="Add Comment">
+                                    </form>
+                                </div>
                         {% endif %}
                     {% else %}
                         <p>Log In to Add Comment.</p>

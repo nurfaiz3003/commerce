@@ -1,8 +1,20 @@
 {% extends "auctions/layout.html" %}
 
+{% block title %}
+    Categories
+{% endblock %}
+
 {% block body %}
-    <h2>Categories</h2>
-    {% for category in categorylist %}
-        <a href="{% url 'linkcat' category.pk %}">{{ category.name }}</a>
-    {% endfor %}
+    <div class="container">
+        <h2 class="my-4">Categories Available</h2>
+        {% for category in categorylist %}
+            <div class="card text-center my-4">
+                <div class="card-body justify-content-center">
+                    <h5 class="card-title">{{ category.name }}</h5>
+                    <p class="card-text">Find {{ category.name }} items on listing.</p>
+                    <a href="{% url 'linkcat' category.pk %}" class="btn btn-primary">Find {{ category.name }} Items!</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

@@ -116,12 +116,14 @@ def listingpage(request, listing_id):
             return render(request, "auctions/listingpage.html", {
                 "listing": AuctionList.objects.get(pk=listing_id),
                 "currentbid": bid,
+                "commentform": CommentForm(),
                 "comments": Comments.objects.filter(auctionlist_id=auction)
             })
         else:
             return render(request, "auctions/listingpage.html", {
                 "listing": AuctionList.objects.get(pk=listing_id),
                 "currentbid": None,
+                "commentform": CommentForm(),
                 "comments": Comments.objects.filter(auctionlist_id=auction)
             })
 
@@ -160,7 +162,9 @@ def placebid(request, listing_id):
                             "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
                             "check": check,
                             "form": BidForm(),
-                            "message": "Place Bid Succesful"
+                            "message": "Place Bid Succesful",
+                            "commentform": CommentForm(),
+                            "comments": Comments.objects.filter(auctionlist_id=auction)
                         })
                 else:
                     return render(request, "auctions/listingpage.html", {
@@ -168,7 +172,9 @@ def placebid(request, listing_id):
                             "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
                             "check": check,
                             "form": BidForm(),
-                            "message": "Bid must be larger than Current or Starting Bid"
+                            "message": "Bid must be larger than Current or Starting Bid",
+                            "commentform": CommentForm(),
+                            "comments": Comments.objects.filter(auctionlist_id=auction)
                         })
             else:
                 if bid > startingbid:
@@ -179,7 +185,9 @@ def placebid(request, listing_id):
                             "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
                             "check": check,
                             "form": BidForm(),
-                            "message": "Place Bid Succesful"
+                            "message": "Place Bid Succesful",
+                            "commentform": CommentForm(),
+                            "comments": Comments.objects.filter(auctionlist_id=auction)
                         })
                 else:
                     return render(request, "auctions/listingpage.html", {
@@ -187,13 +195,17 @@ def placebid(request, listing_id):
                             "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
                             "check": check,
                             "form": BidForm(),
-                            "message": "Bid must be larger than Current or Starting Bid"
+                            "message": "Bid must be larger than Current or Starting Bid",
+                            "commentform": CommentForm(),
+                            "comments": Comments.objects.filter(auctionlist_id=auction)
                         })
         else:
             return render(request, "auctions/listingpage.html", {
                 "listing": AuctionList.objects.get(pk=listing_id),
                 "currentbid": Bid.objects.filter(auctionlist_id = auction).aggregate(Max('bid')),
                 "form": BidForm(),
+                "comments": Comments.objects.filter(auctionlist_id=auction),
+                "commentform": CommentForm(),
                 "message": "Form is Not Valid"
             })
 
